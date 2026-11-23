@@ -1,0 +1,59 @@
+/* iPhone keyboard illustration for desktop previews only. */
+.phone {
+  --demo-keyboard-height:305px;
+  --demo-keyboard-scale:.8863636364;
+  --keyboard-inset:0px;
+}
+.app-surface { bottom:0; }
+.editor-layer { bottom:var(--keyboard-inset); }
+.phone.keyboard-open { --keyboard-inset:var(--demo-keyboard-height); }
+.phone.keyboard-open .app-surface { padding-bottom:calc(var(--demo-keyboard-height) + 12px); }
+.phone.keyboard-open .welcome,
+.phone:has(#message:focus) .welcome { top:calc(34% - 24px); }
+.demo-keyboard {
+  --kbd:#e2e4e8;
+  --kbd-key:#fff;
+  --label:#000;
+  --label4:rgba(60,60,67,.18);
+  --sf:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+  position:absolute;
+  inset:auto 0 0;
+  z-index:30;
+  height:var(--demo-keyboard-height);
+  overflow:clip;
+  transform:translateY(102%);
+  transition:none;
+  background:var(--kbd);
+}
+.demo-keyboard.is-open { transform:translateY(0); }
+.keyboard-canvas {
+  position:absolute;top:0;left:0;width:440px;height:344px;
+  transform:scale(var(--demo-keyboard-scale));transform-origin:top left;
+}
+/* The source illustration is 440 × 344. Scale the whole canvas, preserving keys. */
+.demo-keyboard .ios-keyboard { border-radius:0;transform:none;transition:none; }
+.demo-keyboard .ios-icon { display:inline-block;width:1em;height:1em;fill:none;stroke:none;vertical-align:middle; }
+.demo-keyboard .k.ret .ios-icon { font-size:24px; }
+.keyboard-dismiss {
+  position:absolute;left:50%;bottom:20px;transform:translateX(-50%);
+  width:44px;height:32px;padding:4px;display:grid;place-items:center;
+  color:#505050;border-radius:8px;
+}
+.keyboard-dismiss svg { width:20px;height:20px; }
+.keyboard-home-indicator {
+  position:absolute;bottom:7px;left:50%;transform:translateX(-50%);
+  width:118px;height:4px;background:#151515;border-radius:99px;pointer-events:none;
+}
+@media(prefers-reduced-motion:reduce) { .demo-keyboard { transition:none; } }
+
+/* Let the input and its shadow travel over the complete phone surface. The
+   keyboard inset reserves content space without clipping the animated input. */
+.composer-area { isolation:isolate; }
+.composer-area::before {
+  content:"";position:absolute;inset:-20px 0 -12px;z-index:-1;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(226,228,232,.28));
+  opacity:0;
+}
+.phone.keyboard-open .composer-area::before { opacity:1; }
+
+.phone.keyboard-open .composer { box-shadow:0 4px 16px rgba(0,0,0,.05); }

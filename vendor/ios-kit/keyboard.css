@@ -1,0 +1,21 @@
+/* Keyboard styles from kitlangton/ios-kit. Copyright (c) 2026 Kit Langton. MIT; see LICENSE. */
+.demo-keyboard .ios-keyboard {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 344px; z-index: 50; background: var(--kbd);
+  border-radius: 34px 34px 0 0; transform: translateY(102%); transition: transform .42s cubic-bezier(.32, .72, 0, 1); pointer-events: none;
+  padding-top: 51px;
+}
+.demo-keyboard .ios-keyboard.up { transform: none; }
+.demo-keyboard .ios-keyboard .sugg { position: absolute; left: 0; right: 0; top: 11px; display: flex; height: 26px; align-items: center; font: 17px/22px var(--sf); color: var(--label); }
+.demo-keyboard .ios-keyboard .sugg span { flex: 1; text-align: center; }
+.demo-keyboard .ios-keyboard .sugg span + span { border-left: 1px solid var(--label4); }
+.demo-keyboard .ios-keyboard .kr { display: flex; gap: 6.3px; height: 45px; margin-bottom: 11px; }
+.demo-keyboard .ios-keyboard .k { width: 37px; height: 45px; border-radius: 8.5px; background: var(--kbd-key); display: grid; place-items: center; font: 400 24px/1 var(--sf); color: var(--label); box-shadow: 0 1px 0 rgba(0, 0, 0, .12); }
+.demo-keyboard .ios-keyboard .k.w { width: 50px; }
+.demo-keyboard .ios-keyboard .k.w .ios-icon { font-size: 21px; }
+.demo-keyboard .ios-keyboard .k.wide { width: 102px; font-size: 17px; }
+.demo-keyboard .ios-keyboard .k.sp { width: 210px; }
+.demo-keyboard .ios-keyboard .k.ret { width: 102px; background: #007aff; color: #fff; font-size: 26px; }
+.demo-keyboard .ios-keyboard .kb-bottom { position: absolute; left: 0; right: 0; bottom: 22px; display: flex; justify-content: space-between; padding: 0 31px 0 27px; color: var(--label); }
+.demo-keyboard .ios-keyboard .kb-bottom .ios-icon { font-size: 30px; }
+.demo-keyboard .ios-keyboard .kb-bottom .emoji { font-size: 32px; }
+

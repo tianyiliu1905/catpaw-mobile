@@ -1,0 +1,16 @@
+{
+  "name": "catpaw-mobile-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Catpaw 手机端设计 Demo 与局域网扫码预览",
+  "scripts": {
+    "preview": "node scripts/preview.cjs"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.4",
+    "qrcode": "^1.5.4"
+  },
+  "dependencies": {
+    "html-to-image": "^1.11.13"
+  }
+}
