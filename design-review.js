@@ -29,6 +29,18 @@
     figure.querySelector('button').addEventListener('click',()=>openImage(index));
     return figure;
   });
+  function loadSavedSnapshots() {
+    for (let index=0;index<steps.length;index++) {
+      const src=new URL(`assets/design-review/step-${index+1}.png?v=20261123-picker-heading18`,location.href).href;
+      snapshots[index]=src;
+      const button=frames[index].querySelector('button');
+      const image=document.createElement('img');image.src=src;image.alt=`${steps[index][0]}：${steps[index][1]}`;
+      button.replaceChildren(image);button.disabled=false;
+      const link=frames[index].querySelector('a');link.href=src;link.hidden=false;
+    }
+    complete=true;
+    status.textContent='8 个步骤 · 点击画面放大，或下载 PNG 图片。';
+  }
   function openImage(index) {
     if(!snapshots[index])return;
     const box=document.createElement('div');box.className='review-lightbox';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label',steps[index][0]);
@@ -53,7 +65,8 @@
   toolbar.querySelector('#review-interactive').addEventListener('click',()=>setMode('interactive'));
   toolbar.querySelector('#review-design').addEventListener('click',()=>setMode('design'));
   toolbar.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();const design=event.key==='ArrowRight';setMode(design?'design':'interactive');toolbar.querySelector(design?'#review-design':'#review-interactive').focus();}});
-  regenerate.addEventListener('click',()=>{complete=false;generate();});
+  regenerate.addEventListener('click',()=>{if(location.protocol==='file:'){loadSavedSnapshots();return;}complete=false;generate();});
+  if(location.protocol==='file:')regenerate.textContent='重新加载';
 
   const settle=win=>new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(resolve)));
   async function waitFor(win,predicate) {
@@ -110,5 +123,6 @@
       status.textContent=`生成未完成：${error.message}。可点击“重新生成”重试。`;
     } finally { clearTimeout(timeout);iframe.remove();generating=false;regenerate.disabled=false; }
   }
+  loadSavedSnapshots();
   setMode(new URLSearchParams(location.search).get('view')==='design'?'design':'interactive');
 })();

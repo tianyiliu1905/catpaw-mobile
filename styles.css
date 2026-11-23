@@ -335,8 +335,8 @@ svg {
   width:100%;
   background:var(--ds-background-2);
   border-radius:var(--radius-panel) var(--radius-panel) 0 0;
-  padding:10px var(--space-4) max(36px,env(safe-area-inset-bottom));
-  height:min(380px,80%);
+  padding:10px var(--space-4) max(16px,env(safe-area-inset-bottom));
+  height:min(356px,80%);
   min-height:0;
   max-height:85%;
   display:flex;
@@ -1183,8 +1183,9 @@ button:active {
 
 /* Shared picker header. */
 .picker-sheet-heading { display:grid;grid-template-columns:44px 1fr 44px;align-items:center;flex:none;min-height:40px;margin-bottom:8px; }
-.picker-sheet-heading .sheet-title { margin:0;font-size:16px;line-height:24px;font-weight:500; }
-.picker-sheet-heading button { justify-self:end;display:grid;place-items:center;width:32px;height:32px;padding:0;border-radius:50%;background:var(--ds-background-3);color:var(--ds-text-1); }
+.picker-sheet-heading .sheet-title { margin:0;font-size:18px;line-height:24px;font-weight:500; }
+.picker-sheet-heading button { position:relative;justify-self:end;display:grid;place-items:center;width:20px;height:20px;padding:0;background:transparent;color:var(--ds-text-1); }
+.picker-sheet-heading button::after { content:"";position:absolute;inset:-12px; }
 .picker-sheet-heading button svg { width:20px;height:20px; }
 .sheet.skills-sheet { padding-left:var(--space-4);padding-right:var(--space-4); }
 .sheet:is(.skills-sheet,.experts-sheet,.commands-sheet) #sheet-content { display:flex;flex-direction:column;overflow:hidden; }
@@ -1196,7 +1197,6 @@ button:active {
 .add-sheet .action-row strong { font-weight:var(--weight-body); }
 
 .picker-sheet-heading .picker-sheet-back { justify-self:start;position:relative;background:transparent; }
-.picker-sheet-back::after { content:"";position:absolute;inset:-6px; }
 
 .commands-sheet .simple-list { flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none; }
 .commands-sheet .simple-list::-webkit-scrollbar { display:none; }

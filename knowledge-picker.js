@@ -53,7 +53,7 @@
   function open({ fromAdd = false } = {}) {
     selection = { enabled:input.knowledgeEnabled, selected:new Set(databases.filter(item=>input.knowledgeBases.includes(item.name)).map(item=>item.id)) };
     window.showSheet(`${window.pickerSheetHeader('选择知识库','knowledge-cancel',fromAdd)}
-      <div class="knowledge-enterprise"><strong>企业知识</strong><button type="button" class="knowledge-switch" id="knowledge-enterprise-toggle" role="switch" aria-checked="false" aria-label="使用企业知识"><span></span></button></div>
+      <div class="knowledge-enterprise"><svg class="knowledge-enterprise-icon" aria-hidden="true"><use href="#book"/></svg><strong>企业知识</strong><button type="button" class="knowledge-switch" id="knowledge-enterprise-toggle" role="switch" aria-checked="false" aria-label="使用企业知识"><span></span></button></div>
       <div class="knowledge-options" id="knowledge-options" role="group" aria-label="可选知识库"></div>`, 'knowledge-sheet');
     trigger.setAttribute('aria-expanded','true');
     renderOptions();
