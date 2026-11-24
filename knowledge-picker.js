@@ -1,5 +1,6 @@
 /* Mobile adaptation of the desktop enterprise-knowledge picker. */
 (() => {
+  const independent = new URLSearchParams(location.search).get('knowledge-mode') === 'independent';
   const databases = [
     { id:'product', name:'产品文档与使用指南', description:'产品介绍、功能说明与使用指南' },
     { id:'project', name:'项目需求与设计资料', description:'项目方案、需求与交付资料' },
@@ -19,6 +20,7 @@
     badge.textContent = String(count);
     badge.hidden = !input.knowledgeEnabled;
     trigger.hidden = !input.knowledgeEnabled;
+    document.querySelector('#knowledge-context').hidden = !input.knowledgeEnabled;
     trigger.classList.toggle('is-enabled', input.knowledgeEnabled);
     trigger.setAttribute('aria-label', input.knowledgeEnabled ? `选择知识库，已选择 ${count} 个` : '选择知识库');
     window.updateInput();
@@ -33,27 +35,37 @@
     list.replaceChildren();
     databases.forEach(item => {
       const row = document.createElement('label');
-      row.className = 'knowledge-option'+(selection.enabled?'':' is-disabled');
+      row.className = 'knowledge-option'+(independent || selection.enabled?'':' is-disabled');
       row.innerHTML = `<span class="knowledge-option-name">${item.name}</span><input type="checkbox" data-knowledge-id="${item.id}" aria-label="${item.name}">`;
       const checkbox = row.querySelector('input');
       checkbox.checked = selection.selected.has(item.id);
-      checkbox.disabled = !selection.enabled;
+      checkbox.disabled = !independent && !selection.enabled;
       list.append(row);
     });
     syncPanel();
   }
   function syncPanel() {
-    document.querySelector('#knowledge-enterprise-toggle').setAttribute('aria-checked',String(selection.enabled));
+    const toggle = document.querySelector('#knowledge-enterprise-toggle');
+    if(independent){
+      const allSelected=selection.selected.size===databases.length;
+      toggle.innerHTML=allSelected?'<span>取消全选</span>':'<svg aria-hidden="true"><use href="#plus"/></svg><span>使用全部</span>'; 
+      toggle.setAttribute('aria-label',allSelected?'取消全部知识库选择':'使用全部知识库');
+    }else{
+      toggle.setAttribute('aria-checked',String(selection.enabled));
+    }
   }
   function saveSelection() {
-    input.knowledgeEnabled = selection.enabled;
+    input.knowledgeEnabled = independent ? selection.selected.size > 0 : selection.enabled;
     input.knowledgeBases = databases.filter(item=>selection.selected.has(item.id)).map(item=>item.name);
     syncTrigger();
   }
   function open({ fromAdd = false } = {}) {
+    const allControl=independent
+      ? '<button type="button" class="knowledge-add-all" id="knowledge-enterprise-toggle">使用全部</button>'
+      : '<button type="button" class="knowledge-switch" id="knowledge-enterprise-toggle" role="switch" aria-checked="false" aria-label="使用企业知识"><span></span></button>';
     selection = { enabled:input.knowledgeEnabled, selected:new Set(databases.filter(item=>input.knowledgeBases.includes(item.name)).map(item=>item.id)) };
     window.showSheet(`${window.pickerSheetHeader('选择知识库','knowledge-cancel',fromAdd)}
-      <div class="knowledge-enterprise"><svg class="knowledge-enterprise-icon" aria-hidden="true"><use href="#book"/></svg><strong>企业知识</strong><button type="button" class="knowledge-switch" id="knowledge-enterprise-toggle" role="switch" aria-checked="false" aria-label="使用企业知识"><span></span></button></div>
+      <div class="knowledge-enterprise"><svg class="knowledge-enterprise-icon" aria-hidden="true"><use href="#book"/></svg><strong>企业知识</strong>${allControl}</div>
       <div class="knowledge-options" id="knowledge-options" role="group" aria-label="可选知识库"></div>`, 'knowledge-sheet');
     trigger.setAttribute('aria-expanded','true');
     renderOptions();
@@ -65,7 +77,7 @@
   trigger.addEventListener('click',()=>open());
   content.addEventListener('change', event => {
     const checkbox=event.target.closest('[data-knowledge-id]');
-    if (!checkbox || !selection.enabled) return;
+    if (!checkbox || (!independent && !selection.enabled)) return;
     if (checkbox.checked) selection.selected.add(checkbox.dataset.knowledgeId);
     else selection.selected.delete(checkbox.dataset.knowledgeId);
     syncPanel();
@@ -75,7 +87,7 @@
     const button=event.target.closest('button');if (!button)return;
     switch (button.id) {
       case 'knowledge-enterprise-toggle':
-        selection.enabled=!selection.enabled;
+        selection.enabled=independent ? selection.selected.size !== databases.length : !selection.enabled;
         selection.selected=new Set(selection.enabled?databases.map(item=>item.id):[]);
         renderOptions();saveSelection();break;
       case 'knowledge-cancel':

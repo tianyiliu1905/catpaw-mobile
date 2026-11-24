@@ -92,7 +92,13 @@ function fillPrompt(text) {
   updateInput();
   $('#message').focus();
 }
+function syncExpertTag() {
+  $('#expert-context').hidden=!currentExpert;
+  $('#expert-trigger').innerHTML=currentExpert?`${mobileExpertAvatar(currentExpert,true)}<span>${currentExpert}</span>`:'';
+  $('#composer-contexts').hidden=!currentExpert && !$('#message').knowledgeEnabled && $('#selected-skill').hidden;
+}
 function updateInput() {
+  syncExpertTag();
   const input = $('#message');
   const form = $('#chat-form');
   const hasText = Boolean(input.value.trim());
@@ -147,7 +153,7 @@ content.addEventListener('click', event => {
   if (action === 'skills') return openSkills({ fromAdd });
   if (action === 'experts') return openExperts({ fromAdd });
   if (action === 'commands') return showSheet(`${pickerSheetHeader('自定义命令', '', fromAdd)}<div class="simple-list">${['总结这段内容','润色这段文字','翻译成英文'].map(name=>`<button class="action-row" data-command="${name}"><span class="row-icon">${icon('terminal')}</span>${name}</button>`).join('')}</div>`, 'commands-sheet');
-  if (button.dataset.expert) {currentExpert=button.dataset.expert;closeSheet();fillPrompt($('#message').value || `请作为${currentExpert}，帮我`);return;}
+  if (button.dataset.expert) {currentExpert=button.dataset.expert;updateInput();closeSheet();$('#message').focus({preventScroll:true});return;}
   if (button.dataset.command) {closeSheet();fillPrompt(`${button.dataset.command}：`);return;}
   if (button.dataset.model) {model=button.dataset.model;$('#model-button').textContent=model;closeSheet();return;}
   if (button.dataset.project) {$('#current-project').textContent=button.dataset.project;$('#side-project-name').textContent=button.dataset.project;closeSheet();return;}
@@ -158,6 +164,8 @@ content.addEventListener('click', event => {
   const input = {camera:'#camera-input',image:'#photo-input',file:'#file-input'}[attachment];
   if (input) {$(input).click();closeSheet();}
 });
+$('#expert-trigger').addEventListener('click',()=>openExperts());
+$('#remove-expert').addEventListener('click',()=>{currentExpert='';updateInput();});
 $('#selected-skill').addEventListener('click', event => {if(event.target.closest('#remove-skill')) {currentSkill='';$('#selected-skill').hidden=true;updateInput();}});
 document.querySelectorAll('[data-prompt]').forEach(button=>button.addEventListener('click',()=>fillPrompt(button.dataset.prompt)));
 document.querySelectorAll('input[type=file]').forEach(input=>input.addEventListener('change',()=>{if(!input.files.length)return;$('#attachment-preview').textContent='附件：'+[...input.files].map(file=>file.name).join('、');$('#attachment-preview').hidden=false;updateInput();toast(`已添加 ${input.files.length} 个附件`);}));

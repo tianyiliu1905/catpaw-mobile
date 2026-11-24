@@ -135,3 +135,18 @@
   grid-column:3 / 5;
   justify-self:end;
 }
+
+/* Selected contexts sit above the text, as in Figma 5091:45587. */
+.composer .composer-contexts { grid-column:1/-1;grid-row:2;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-left:4px;margin-bottom:8px;min-width:0; }
+.composer-context-tag { display:inline-flex;align-items:center;gap:4px;max-width:100%;height:28px;padding:0 6px;border-radius:var(--radius-pill);font-size:14px;line-height:21px; }
+.expert-context { background:var(--ds-fill-3);color:var(--ds-text-2); }
+.knowledge-context { padding:0 12px 0 10px;background:var(--ds-primary-1);color:var(--ds-primary-6); }
+.composer-context-tag>button:first-child { display:inline-flex;align-items:center;gap:4px;min-width:0;padding:0;font-size:14px;line-height:21px;white-space:nowrap; }
+#expert-trigger>span { overflow:hidden;text-overflow:ellipsis; }
+#expert-trigger .expert-avatar { width:20px;height:20px;border-radius:6px;flex:none;stroke:none; }
+.context-remove { position:relative;display:grid;place-items:center;width:16px;height:16px;flex:none;padding:0; }
+.context-remove img { width:16px;height:16px; }
+.context-remove::after { content:"";position:absolute;inset:-6px -2px; }
+.composer .composer-contexts .selected-skill { margin:0; }
+
+.composer:not(.is-multiline) .composer-contexts { margin-bottom:12px; }

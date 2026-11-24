@@ -1,18 +1,8 @@
 /* Shared knowledge semantics, presented with mobile-sized controls and a sheet. */
-.knowledge-trigger { display:none; }
-.composer.is-multiline .knowledge-trigger,
-.in-conversation .composer.is-multiline .knowledge-trigger {
-  display:inline-flex;align-items:center;justify-self:start;gap:4px;
-  grid-column:2;grid-row:4;min-width:0;max-width:100%;height:var(--composer-action-size);
-  position:relative;padding:0 12px 0 10px;background:var(--ds-primary-1);color:var(--ds-primary-6);font-size:var(--type-label);
-  line-height:21px;border-radius:var(--radius-pill);white-space:nowrap;
-}
-.knowledge-trigger::after { content:"";position:absolute;inset:-8px 0; }
+.knowledge-trigger { display:inline-flex;align-items:center;gap:4px;min-width:0;padding:0;background:transparent;color:inherit;font-size:var(--type-label);line-height:21px;white-space:nowrap; }
 .knowledge-trigger>svg { width:16px;height:16px; }
 .knowledge-trigger>span { overflow:hidden;text-overflow:ellipsis; }
-.composer.is-multiline .knowledge-trigger.is-enabled { color:var(--ds-primary-6); }
-.composer.is-multiline .knowledge-trigger[aria-expanded="true"],
-.in-conversation .composer.is-multiline .knowledge-trigger[aria-expanded="true"] { background:var(--ds-primary-2); }
+.knowledge-context:has(.knowledge-trigger[aria-expanded="true"]) { background:var(--ds-primary-2); }
 #knowledge-count { flex:none;font-variant-numeric:tabular-nums; }
 .knowledge-sheet { padding-bottom:max(16px,env(safe-area-inset-bottom)); }
 .knowledge-sheet #sheet-content { display:flex;flex-direction:column;overflow:hidden; }
@@ -48,3 +38,7 @@
 .knowledge-option-name { flex:1;min-width:0;font-size:var(--type-nav);font-weight:var(--weight-body);line-height:24px; }
 
 .knowledge-enterprise-icon { width:20px;height:20px;flex:none;transform:translateX(4px); }
+
+.knowledge-add-all { display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:none;min-height:32px;padding:4px 12px;margin-right:4px;border-radius:var(--radius-pill);background:var(--ds-fill-10);color:var(--ds-text-7);font-size:var(--type-label);line-height:24px;font-weight:var(--weight-body); }
+
+.knowledge-add-all>svg { width:16px;height:16px;flex:none; }
