@@ -31,7 +31,7 @@
     ['选择知识库',iconMode?'企业知识默认关闭，下方列表隐藏。':independent?'可勾选“全选”，也可直接勾选下方任意知识库。':'企业知识默认关闭，列表不可选择。'],
     iconMode?['开启并多选全部','开启开关后展示列表，默认选中全部知识库；面板保持打开。']:independent?['单独添加','直接勾选“产品文档与使用指南”，立即添加，不影响其他选项。']:['开启企业知识','开启开关，默认选中全部三个知识库。'],
     iconMode?['单项添加后返回首页','首次点击单项右侧的指定图标进入逐项添加，回到首页显示所选知识文档的名称；再次打开列表仍显示相同图标。']:independent?['一键全选','勾选“全选”可选中全部三个知识库；取消勾选可清空，取消任一单项后，“全选”恢复空心描边状态。']:['按需调整','取消“团队流程与协作规范”，保留两个知识库；关闭开关暂停使用但保留勾选，再开启恢复。'],
-    ['已添加知识库',iconMode?'再次打开并添加另一项，输入框标签累加为“知识 2”；重复添加同一项不会重复计数。':`选择即时生效，关闭面板后输入正文上方显示绿色“知识 ${independent?3:2}”。`],
+    ['已添加知识库',iconMode?'再次打开并添加另一篇，输入框上方分别展示两篇知识的名称标签；重复添加不产生重复标签。':`选择即时生效，关闭面板后输入正文上方显示绿色“知识 ${independent?3:2}”。`],
     ['收起输入','空内容点击外部后恢复单行，已选知识库标签仍显示在输入区上方。'],
     ['专家与知识库并排','专家和知识库标签并排位于输入正文上方；点击知识库标签重新选择，专家可通过叉号移除。'],
   ];
@@ -49,7 +49,7 @@
   });
   function loadSavedSnapshots() {
     for (let index=0;index<steps.length;index++) {
-      const src=new URL(`assets/${iconMode?'design-review-icons':independent?'design-review-independent':'design-review'}/step-${index+1}.png?v=20261125-text16`,location.href).href;
+      const src=new URL(`assets/${iconMode?'design-review-icons':independent?'design-review-independent':'design-review'}/step-${index+1}.png?v=20261125-focus-icon20`,location.href).href;
       snapshots[index]=src;
       const button=frames[index].querySelector('button');
       const image=document.createElement('img');image.src=src;image.alt=`${steps[index][0]}：${steps[index][1]}`;

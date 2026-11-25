@@ -51,3 +51,10 @@
 .knowledge-icons-sheet .knowledge-option:not(:last-child)::after { height:.5px;background:rgba(59,59,59,.08); }
 
 .knowledge-icons-sheet .knowledge-item-add { transform:translateX(2px); }
+
+.knowledge-document-tags { display:contents; }
+.knowledge-document-trigger { gap:4px;min-width:0;max-width:100%;border:0;cursor:pointer; }
+.knowledge-document-trigger>svg { width:16px;height:16px;flex:none; }
+.knowledge-document-trigger>span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+
+.knowledge-item-add>img { transform:scale(.8333333333); }

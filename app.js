@@ -115,6 +115,7 @@ function updateInput() {
   }
   input.style.overflowY = input.scrollHeight > 168 ? 'auto' : 'hidden';
   $('#expand-input').hidden = !multiline;
+  $('#app').style.setProperty('--context-extra-height',Math.max(0,$('#composer-contexts').offsetHeight-28)+'px');
   $('#voice-button').hidden = generating || (hasText && !multiline);
   $('#send-button').hidden = !hasText || generating;
   $('#stop-button').hidden = !generating;

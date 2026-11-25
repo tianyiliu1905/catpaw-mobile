@@ -26,8 +26,21 @@
     const single=count===1;
     document.querySelector('#knowledge-label').textContent=single?input.knowledgeBases[0]:'知识';
     badge.hidden = !input.knowledgeEnabled || single;
-    trigger.hidden = !input.knowledgeEnabled;
-    document.querySelector('#knowledge-context').hidden = !input.knowledgeEnabled;
+    const individualTags=iconMode && !iconAllMode && input.knowledgeEnabled && count>0;
+    const tagList=document.querySelector('#knowledge-document-tags');
+    tagList.replaceChildren();
+    tagList.hidden=!individualTags;
+    if(individualTags){
+      input.knowledgeBases.forEach(name=>{
+        const tag=document.createElement('button');tag.type='button';
+        tag.className='composer-context-tag knowledge-context knowledge-document-trigger';
+        tag.setAttribute('aria-label',`重新选择知识：${name}`);tag.setAttribute('aria-haspopup','dialog');
+        tag.innerHTML='<svg aria-hidden="true"><use href="#book"/></svg><span></span>';
+        tag.querySelector('span').textContent=name;tagList.append(tag);
+      });
+    }
+    trigger.hidden = !input.knowledgeEnabled || individualTags;
+    document.querySelector('#knowledge-context').hidden = !input.knowledgeEnabled || individualTags;
     trigger.classList.toggle('is-enabled', input.knowledgeEnabled);
     trigger.setAttribute('aria-label', input.knowledgeEnabled ? `选择知识，已选择 ${input.knowledgeBases.join("、")}` : '选择知识库');
     window.updateInput();
@@ -35,7 +48,8 @@
   function clear() {
     remembered = new Set();
     hasSelection = false;
-    iconAllMode = false;    selection = { enabled:false, selected:new Set() };
+    iconAllMode = false;
+    selection = { enabled:false, selected:new Set() };
     input.knowledgeEnabled = false;
     input.knowledgeBases = [];
     syncTrigger();
@@ -92,6 +106,9 @@
     if (event.button === 0) event.preventDefault();
   });
   trigger.addEventListener('click',()=>open());
+  const documentTags=document.querySelector('#knowledge-document-tags');
+  documentTags.addEventListener('pointerdown',event=>{if(event.button===0)event.preventDefault();});
+  documentTags.addEventListener('click',event=>{if(event.target.closest('.knowledge-document-trigger'))open();});
   content.addEventListener('change', event => {
     if(independent && event.target.id==='knowledge-enterprise-toggle'){
       selection.enabled=event.target.checked;

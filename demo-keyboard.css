@@ -9,7 +9,7 @@
 .phone.keyboard-open { --keyboard-inset:var(--demo-keyboard-height); }
 .phone.keyboard-open .app-surface { padding-bottom:calc(var(--demo-keyboard-height) + 12px); }
 .phone.keyboard-open .welcome,
-.phone:has(#message:focus) .welcome { top:calc(34% - 24px); }
+.phone:has(#message:focus) .welcome { top:calc(34% - 24px - var(--context-extra-height,0px)); }
 .demo-keyboard {
   --kbd:#e2e4e8;
   --kbd-key:#fff;
