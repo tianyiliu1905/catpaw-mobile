@@ -50,8 +50,8 @@ function showSheet(html, type = '') {
   layer.classList.remove('closing');
   layer.hidden = false;
   sheet.className = `sheet ${type}`;
-  if (type !== 'knowledge-sheet') $('#knowledge-trigger').setAttribute('aria-expanded', 'false');
-  $('#sheet-handle').hidden = ['knowledge-sheet','skills-sheet','experts-sheet','commands-sheet','add-sheet'].includes(type);
+  if (!type.split(' ').includes('knowledge-sheet')) $('#knowledge-trigger').setAttribute('aria-expanded', 'false');
+  $('#sheet-handle').hidden = ['knowledge-sheet','skills-sheet','experts-sheet','commands-sheet','add-sheet'].includes(type.split(' ')[0]);
   content.innerHTML = html;
   $('#app-surface').inert = true;
   // Focusing the entering sheet must not scroll the phone underneath it.

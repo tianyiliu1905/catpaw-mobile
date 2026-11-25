@@ -2,22 +2,24 @@
 (() => {
   if (new URLSearchParams(location.search).has('design-capture')) return;
   const independent = new URLSearchParams(location.search).get('knowledge-mode') === 'independent';
+  const iconMode = new URLSearchParams(location.search).get('knowledge-mode') === 'icons';
   const phone = document.querySelector('#app');
   document.documentElement.classList.add('has-design-review');
   const toolbar = document.createElement('div');toolbar.className='review-toolbar';
   toolbar.innerHTML='<span class="review-product">Catpaw Mobile</span><div class="review-tabs" role="tablist" aria-label="预览方式"><button type="button" role="tab" id="review-interactive" aria-controls="app" aria-selected="true">交互演示</button><button type="button" role="tab" id="review-design" aria-controls="review-gallery" aria-selected="false" tabindex="-1">设计稿</button></div>';
-  const version=document.createElement('label');version.className='review-version';
-  version.innerHTML='<span>交互版本</span><select aria-label="交互版本"><option value="original">原版</option><option value="independent">新版 · 独立添加</option></select>';
-  version.querySelector('select').value=independent?'independent':'original';
-  version.querySelector('select').addEventListener('change',event=>{
-    const url=new URL(location.href);
-    if(event.target.value==='independent')url.searchParams.set('knowledge-mode','independent');else url.searchParams.delete('knowledge-mode');
-    location.href=url.href;
-  });
-  toolbar.insertBefore(version,toolbar.querySelector('.review-tabs'));
   const gallery=document.createElement('section');gallery.className='review-gallery';gallery.id='review-gallery';gallery.hidden=true;gallery.setAttribute('role','tabpanel');gallery.setAttribute('aria-labelledby','review-design');
   gallery.innerHTML='<header class="review-heading"><div><h1>添加知识库</h1></div><button type="button" class="review-regenerate">重新生成</button></header><p class="review-progress" role="status" aria-live="polite" hidden></p><div class="review-steps"></div>';
   document.body.prepend(toolbar);document.body.append(gallery);
+  const notes=document.createElement('aside');notes.className='scheme-notes';notes.setAttribute('aria-label','方案优势');
+  const currentScheme=iconMode?'icons':independent?'independent':'original';
+  notes.innerHTML=[['original','方案一','方便随时开关企业知识。'],['independent','方案二','方便每次选择。'],['icons','方案三','方便单选。']].map(([value,title,description])=>`<div class="scheme-note"><div class="scheme-note-heading"><h2>${title}</h2><button type="button" data-scheme="${value}" aria-label="${currentScheme===value?'当前':'切换到'}${title}" aria-pressed="${currentScheme===value}">${currentScheme===value?'当前':'切换'}</button></div>${description?`<p>${description}</p>`:''}</div>`).join('');
+  notes.addEventListener('click',event=>{
+    const button=event.target.closest('[data-scheme]');if(!button||button.dataset.scheme===currentScheme)return;
+    const url=new URL(location.href);
+    if(button.dataset.scheme==='original')url.searchParams.delete('knowledge-mode');else url.searchParams.set('knowledge-mode',button.dataset.scheme);
+    location.href=url.href;
+  });
+  document.body.append(notes);
   const status=gallery.querySelector('.review-progress');
   const regenerate=gallery.querySelector('.review-regenerate');
   let generating=false, complete=false;
@@ -26,10 +28,10 @@
     ['默认首页','输入框为单行，尚未启用知识库。'],
     ['展开输入','点击输入框，文字区展开为两行并唤起键盘。'],
     ['打开添加面板','点击加号，选择列表中的“知识库”。'],
-    ['选择知识库',independent?'可点击“使用全部”，也可直接勾选下方任意知识库。':'企业知识默认关闭，列表不可选择。'],
-    independent?['单独添加','直接勾选“产品文档与使用指南”，立即添加，不影响其他选项。']:['开启企业知识','开启开关，默认选中全部三个知识库。'],
-    independent?['一键使用全部','点击“使用全部”，一次使用全部三个知识库；按钮变为“取消全选”。']:['按需调整','取消“团队流程与协作规范”，保留两个知识库。'],
-    ['已添加知识库',`选择即时生效，关闭面板后输入正文上方显示绿色“知识库 ${independent?3:2}”。`],
+    ['选择知识库',iconMode?'企业知识默认关闭，下方列表隐藏。':independent?'可勾选“全选”，也可直接勾选下方任意知识库。':'企业知识默认关闭，列表不可选择。'],
+    iconMode?['开启并多选全部','开启开关后展示列表，默认选中全部知识库；面板保持打开。']:independent?['单独添加','直接勾选“产品文档与使用指南”，立即添加，不影响其他选项。']:['开启企业知识','开启开关，默认选中全部三个知识库。'],
+    iconMode?['单项添加后返回首页','首次点击单项右侧的指定图标进入逐项添加，回到首页显示所选知识文档的名称；再次打开列表仍显示相同图标。']:independent?['一键全选','勾选“全选”可选中全部三个知识库；取消勾选可清空，取消任一单项后，“全选”恢复空心描边状态。']:['按需调整','取消“团队流程与协作规范”，保留两个知识库；关闭开关暂停使用但保留勾选，再开启恢复。'],
+    ['已添加知识库',iconMode?'再次打开并添加另一项，输入框标签累加为“知识 2”；重复添加同一项不会重复计数。':`选择即时生效，关闭面板后输入正文上方显示绿色“知识 ${independent?3:2}”。`],
     ['收起输入','空内容点击外部后恢复单行，已选知识库标签仍显示在输入区上方。'],
     ['专家与知识库并排','专家和知识库标签并排位于输入正文上方；点击知识库标签重新选择，专家可通过叉号移除。'],
   ];
@@ -47,7 +49,7 @@
   });
   function loadSavedSnapshots() {
     for (let index=0;index<steps.length;index++) {
-      const src=new URL(`assets/${independent?'design-review-independent':'design-review'}/step-${index+1}.png?v=20261124-use-all-black`,location.href).href;
+      const src=new URL(`assets/${iconMode?'design-review-icons':independent?'design-review-independent':'design-review'}/step-${index+1}.png?v=20261125-text16`,location.href).href;
       snapshots[index]=src;
       const button=frames[index].querySelector('button');
       const image=document.createElement('img');image.src=src;image.alt=`${steps[index][0]}：${steps[index][1]}`;
@@ -69,6 +71,7 @@
   function setMode(mode) {
     const design=mode==='design';phone.hidden=design;phone.inert=design;gallery.hidden=!design;
     document.body.classList.toggle('design-review-mode',design);
+    if(design)gallery.querySelector('.review-heading').after(notes);else document.body.append(notes);
     for(const button of toolbar.querySelectorAll('[role=tab]')){
       const selected=button.id===(design?'review-design':'review-interactive');
       button.setAttribute('aria-selected',String(selected));button.tabIndex=selected?0:-1;
@@ -106,7 +109,7 @@
     let timeout;
     try {
       const loaded=new Promise((resolve,reject)=>{iframe.onload=resolve;iframe.onerror=()=>reject(new Error('无法加载设计稿实例'));timeout=setTimeout(()=>reject(new Error('设计稿实例加载超时')),15000);});
-      const url=new URL('index.html',location.href);url.searchParams.set('design-capture','1');if(independent)url.searchParams.set('knowledge-mode','independent');iframe.src=url.href;document.body.append(iframe);await loaded;clearTimeout(timeout);
+      const url=new URL('index.html',location.href);url.searchParams.set('design-capture','1');if(iconMode||independent)url.searchParams.set('knowledge-mode',iconMode?'icons':'independent');iframe.src=url.href;document.body.append(iframe);await loaded;clearTimeout(timeout);
       const win=iframe.contentWindow,doc=iframe.contentDocument,app=doc.querySelector('#app');
       if(!win.CatpawKnowledge||!win.CatpawDemoKeyboard||!window.htmlToImage)throw new Error('设计稿依赖未加载，请刷新后重试');
       const style=doc.createElement('style');style.textContent='*{animation:none!important;transition:none!important;caret-color:transparent!important}#app{width:390px!important;height:844px!important;max-width:none!important;zoom:1!important;--composer-action-size:28px!important}';doc.head.append(style);
@@ -117,8 +120,8 @@
         if(index===2)win.openAdd();
         if(index===3)win.document.querySelector('[data-action="knowledge"]').click();
         if(index===4)click(independent?'[data-knowledge-id="product"]':'#knowledge-enterprise-toggle');
-        if(index===5)click(independent?'#knowledge-enterprise-toggle':'[data-knowledge-id="team"]');
-        if(index===6){click('#knowledge-cancel');await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);win.CatpawDemoKeyboard.setOpen(true,true);}
+        if(index===5){click(iconMode?'[data-knowledge-add="product"]':independent?'#knowledge-enterprise-toggle':'[data-knowledge-id="team"]');if(iconMode)await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);}
+        if(index===6){if(iconMode){win.CatpawKnowledge.open();click('[data-knowledge-add="team"]');}else click('#knowledge-cancel');await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);win.CatpawDemoKeyboard.setOpen(true,true);}
         if(index===7)win.CatpawDemoKeyboard.dismiss(true);
         if(index===8){win.CatpawDemoKeyboard.setOpen(true,true);win.openExperts();click('[data-expert="数据分析师"]');await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);win.CatpawDemoKeyboard.setOpen(true,true);}
         await settle(win);
