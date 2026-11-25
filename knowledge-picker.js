@@ -4,9 +4,9 @@
   const iconMode = new URLSearchParams(location.search).get('knowledge-mode') === 'icons';
   const individual = independent || iconMode;
   const databases = [
-    { id:'product', name:'产品文档与使用指南', description:'产品介绍、功能说明与使用指南' },
+    { id:'product', name:'产品指南', description:'产品介绍、功能说明与使用指南' },
     { id:'project', name:'项目需求与设计资料', description:'项目方案、需求与交付资料' },
-    { id:'team', name:'团队流程与协作规范', description:'团队流程、协作规范与常见问题' },
+    { id:'team', name:'团队协作规范', description:'团队流程、团队协作规范与常见问题' },
   ];
   const input = document.querySelector('#message');
   const trigger = document.querySelector('#knowledge-trigger');
@@ -17,6 +17,7 @@
   let remembered = new Set();
   let hasSelection = false;
   let iconAllMode = false;
+  let enterpriseEnabled = false;
   let selection = { enabled:false, selected:new Set() };
 
   function syncTrigger() {
@@ -24,19 +25,26 @@
     const badge = document.querySelector('#knowledge-count');
     badge.textContent = String(count);
     const single=count===1;
-    document.querySelector('#knowledge-label').textContent=single?input.knowledgeBases[0]:'知识';
-    badge.hidden = !input.knowledgeEnabled || single;
+    const enterpriseTag=iconMode && iconAllMode;
+    document.querySelector('#knowledge-label').textContent=enterpriseTag?'企业知识':single?input.knowledgeBases[0]:'知识';
+    badge.hidden = !input.knowledgeEnabled || single || enterpriseTag;
     const individualTags=iconMode && !iconAllMode && input.knowledgeEnabled && count>0;
     const tagList=document.querySelector('#knowledge-document-tags');
     tagList.replaceChildren();
     tagList.hidden=!individualTags;
     if(individualTags){
       input.knowledgeBases.forEach(name=>{
-        const tag=document.createElement('button');tag.type='button';
-        tag.className='composer-context-tag knowledge-context knowledge-document-trigger';
-        tag.setAttribute('aria-label',`重新选择知识：${name}`);tag.setAttribute('aria-haspopup','dialog');
-        tag.innerHTML='<svg aria-hidden="true"><use href="#book"/></svg><span></span>';
-        tag.querySelector('span').textContent=name;tagList.append(tag);
+        const tag=document.createElement('div');
+        tag.className='composer-context-tag knowledge-context knowledge-document-tag';
+        const opener=document.createElement('button');opener.type='button';opener.className='knowledge-document-trigger';
+        opener.setAttribute('aria-label',`重新选择知识：${name}`);opener.setAttribute('aria-haspopup','dialog');
+        opener.innerHTML='<svg aria-hidden="true"><use href="#book"/></svg><span></span>';
+        opener.querySelector('span').textContent=name;
+        const remove=document.createElement('button');remove.type='button';remove.className='context-remove';
+        remove.dataset.knowledgeRemove=databases.find(item=>item.name===name).id;
+        remove.setAttribute('aria-label',`移除知识：${name}`);
+        remove.innerHTML='<img src="assets/figma/tag-close.svg" alt="">';
+        tag.append(opener,remove);tagList.append(tag);
       });
     }
     trigger.hidden = !input.knowledgeEnabled || individualTags;
@@ -49,6 +57,7 @@
     remembered = new Set();
     hasSelection = false;
     iconAllMode = false;
+    enterpriseEnabled = false;
     selection = { enabled:false, selected:new Set() };
     input.knowledgeEnabled = false;
     input.knowledgeBases = [];
@@ -95,7 +104,7 @@
       ? '<label class="knowledge-all-label"><span>全选</span><input type="checkbox" class="knowledge-all-checkbox" id="knowledge-enterprise-toggle" aria-label="全选知识库"></label>'
       : '<button type="button" class="knowledge-switch" id="knowledge-enterprise-toggle" role="switch" aria-checked="false" aria-label="使用企业知识"><span></span></button>';
     selection = { enabled:input.knowledgeEnabled, selected:individual?new Set(databases.filter(item=>input.knowledgeBases.includes(item.name)).map(item=>item.id)):new Set(remembered) };
-    window.showSheet(`${window.pickerSheetHeader('选择知识库','knowledge-cancel',fromAdd)}
+    window.showSheet(`${window.pickerSheetHeader('选择知识库',fromAdd)}
       <div class="knowledge-enterprise"><svg class="knowledge-enterprise-icon" aria-hidden="true"><use href="#book"/></svg><strong>企业知识</strong>${allControl}</div>
       <div class="knowledge-options" id="knowledge-options" role="group" aria-label="可选知识库"></div>`, iconMode?'knowledge-sheet knowledge-icons-sheet':'knowledge-sheet');
     trigger.setAttribute('aria-expanded','true');
@@ -108,7 +117,22 @@
   trigger.addEventListener('click',()=>open());
   const documentTags=document.querySelector('#knowledge-document-tags');
   documentTags.addEventListener('pointerdown',event=>{if(event.button===0)event.preventDefault();});
-  documentTags.addEventListener('click',event=>{if(event.target.closest('.knowledge-document-trigger'))open();});
+  documentTags.addEventListener('click',event=>{
+    const remove=event.target.closest('[data-knowledge-remove]');
+    if(remove){
+      selection.selected.delete(remove.dataset.knowledgeRemove);
+      if(selection.selected.size===0 && enterpriseEnabled){
+        selection.selected=new Set(databases.map(item=>item.id));
+        selection.enabled=true;iconAllMode=true;
+      }else{
+        selection.enabled=selection.selected.size>0;iconAllMode=false;
+      }
+      saveSelection();
+      (documentTags.querySelector('.knowledge-document-trigger') || document.querySelector('#add-button')).focus({preventScroll:true});
+      return;
+    }
+    if(event.target.closest('.knowledge-document-trigger'))open();
+  });
   content.addEventListener('change', event => {
     if(independent && event.target.id==='knowledge-enterprise-toggle'){
       selection.enabled=event.target.checked;
@@ -137,7 +161,7 @@
     switch (button.id) {
       case 'knowledge-enterprise-toggle':
         selection.enabled=independent ? selection.selected.size !== databases.length : !selection.enabled;
-        if(iconMode)iconAllMode=selection.enabled;
+        if(iconMode){iconAllMode=selection.enabled;enterpriseEnabled=selection.enabled;}
         if(individual)selection.selected=new Set(selection.enabled?databases.map(item=>item.id):[]);
         else if(selection.enabled && !hasSelection)selection.selected=new Set(databases.map(item=>item.id));
         renderOptions();saveSelection();

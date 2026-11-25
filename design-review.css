@@ -41,3 +41,5 @@ body.design-review-mode { display:block; }
 .scheme-note-heading button { min-height:28px;padding:2px 10px;border:1px solid var(--ds-border-3);border-radius:var(--radius-pill);background:var(--ds-background-2);color:var(--ds-text-3);font-size:12px;line-height:20px; }
 .scheme-note-heading button[aria-pressed=true] { border-color:transparent;background:var(--ds-fill-3);color:var(--ds-text-4); }
 @media(max-width:1049px) { .scheme-notes { flex-wrap:wrap; } }
+
+.review-step figcaption .review-height-note { color:var(--ds-warning-5); }

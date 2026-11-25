@@ -22,13 +22,12 @@ let currentExpert = '';
     const palette = mobileExperts.find(expert => expert.name === name)?.palette || 'data';
     return `<svg class="expert-avatar${rounded ? ' expert-avatar-rounded' : ''}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${rounded ? `<rect width="24" height="24" rx="6" fill="var(--expert-${palette}-background)"/>` : `<circle cx="12" cy="12" r="12" fill="var(--expert-${palette}-background)"/>`}<path d="M4.2 24V12.3c0-3.4 1-6.5 2.8-8.9l2 3.4a8.5 8.5 0 0 1 6.4-.5l1.3-2.9c2 2.8 3.3 5.6 3.3 8.9 0 3.2-1.2 5.3-3.2 6.1-.5.2-.6.5-.6 1V24Z" fill="var(--expert-${palette}-face)"/><circle cx="10.6" cy="11.7" r="1" fill="var(--expert-${palette}-accent)"/><circle cx="15.8" cy="11.4" r="1" fill="var(--expert-${palette}-accent)"/></svg>`;
   }
-function pickerSheetHeader(title, closeId = '', fromAdd = false) {
-  const action = closeId ? `id="${closeId}"` : 'data-action="close-sheet"';
+function pickerSheetHeader(title, fromAdd = false) {
   const back = fromAdd ? '<button type="button" class="picker-sheet-back" data-action="back-to-add" aria-label="返回添加面板"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' : '<span></span>';
-  return `<div class="picker-sheet-heading">${back}<h2 class="sheet-title" id="sheet-title">${title}</h2><button type="button" ${action} aria-label="关闭面板">${icon('close')}</button></div>`;
+  return `<div class="picker-sheet-heading">${back}<h2 class="sheet-title" id="sheet-title">${title}</h2><span aria-hidden="true"></span></div>`;
 }
 function openExperts({ fromAdd = false } = {}) {
-  showSheet(`${pickerSheetHeader('我的专家', '', fromAdd)}<div class="mobile-expert-list" role="group" aria-label="选择专家">${mobileExperts.map(expert => `<button type="button" class="mobile-expert-row" data-expert="${expert.name}" aria-pressed="${expert.name === currentExpert}">${mobileExpertAvatar(expert.name,true)}<span class="mobile-expert-copy"><strong>${expert.name}</strong><small>${expert.description}</small></span><span class="mobile-expert-state">${expert.name===currentExpert?'已选':''}</span></button>`).join('')}</div>`, 'experts-sheet');
+  showSheet(`${pickerSheetHeader('我的专家', fromAdd)}<div class="mobile-expert-list" role="group" aria-label="选择专家">${mobileExperts.map(expert => `<button type="button" class="mobile-expert-row" data-expert="${expert.name}" aria-pressed="${expert.name === currentExpert}">${mobileExpertAvatar(expert.name,true)}<span class="mobile-expert-copy"><strong>${expert.name}</strong><small>${expert.description}</small></span><span class="mobile-expert-state">${expert.name===currentExpert?'已选':''}</span></button>`).join('')}</div>`, 'experts-sheet');
 }
 let currentSkill = '';
 let model = 'Auto';
@@ -78,7 +77,7 @@ function openAdd() {
   showSheet(`<h2 id="sheet-title" hidden>添加到对话</h2><div class="attachment-grid">${[['camera','拍照'],['image','相册'],['file','文件'],['book','资料库']].map(([name,label]) => `<button class="attachment-tile" data-attachment="${name}">${icon(name)}<span>${label}</span></button>`).join('')}</div>${[['brain','专家','experts'],['book','知识库','knowledge'],['skills','技能','skills'],['terminal','自定义命令','commands']].map(([name,label,action])=>`<button class="action-row" data-action="${action}"><span class="row-icon">${icon(name)}</span><strong>${label}</strong></button>`).join('')}`, 'add-sheet');
 }
 function openSkills({ fromAdd = false } = {}) {
-  showSheet(`${pickerSheetHeader('我的技能', '', fromAdd)}<div class="skill-list">${skills.map(([name,description,type],i)=>`<button class="skill-row" data-skill="${i}"><span class="skill-art ${type}">${type==='palette'?'<img src="assets/logo.png" alt="">':`<img src="assets/${{docx:'artifact-doc',pdf:'artifact-pdf',pptx:'artifact-ppt','skill-creator':'artifact-markdown',xlsx:'artifact-excel'}[name]}.svg" alt="">`}</span><span class="skill-copy"><span class="skill-name">${name}<span class="badge">内置</span></span><span class="skill-description">${description}</span></span></button>`).join('')}</div>`, 'skills-sheet');
+  showSheet(`${pickerSheetHeader('我的技能', fromAdd)}<div class="skill-list">${skills.map(([name,description,type],i)=>`<button class="skill-row" data-skill="${i}"><span class="skill-art ${type}">${type==='palette'?'<img src="assets/logo.png" alt="">':`<img src="assets/${{docx:'artifact-doc',pdf:'artifact-pdf',pptx:'artifact-ppt','skill-creator':'artifact-markdown',xlsx:'artifact-excel'}[name]}.svg" alt="">`}</span><span class="skill-copy"><span class="skill-name">${name}<span class="badge">内置</span></span><span class="skill-description">${description}</span></span></button>`).join('')}</div>`, 'skills-sheet');
 }
 function selectSkill(index) {
   currentSkill = skills[index][0];
@@ -94,7 +93,7 @@ function fillPrompt(text) {
 }
 function syncExpertTag() {
   $('#expert-context').hidden=!currentExpert;
-  $('#expert-trigger').innerHTML=currentExpert?`${mobileExpertAvatar(currentExpert,true)}<span>${currentExpert}</span>`:'';
+  $('#expert-trigger').innerHTML=currentExpert?`${mobileExpertAvatar(currentExpert)}<span>${currentExpert}</span>`:'';
   $('#composer-contexts').hidden=!currentExpert && !$('#message').knowledgeEnabled && $('#selected-skill').hidden;
 }
 function updateInput() {
@@ -153,7 +152,7 @@ content.addEventListener('click', event => {
   if (action === 'knowledge') return window.CatpawKnowledge.open({ fromAdd });
   if (action === 'skills') return openSkills({ fromAdd });
   if (action === 'experts') return openExperts({ fromAdd });
-  if (action === 'commands') return showSheet(`${pickerSheetHeader('自定义命令', '', fromAdd)}<div class="simple-list">${['总结这段内容','润色这段文字','翻译成英文'].map(name=>`<button class="action-row" data-command="${name}"><span class="row-icon">${icon('terminal')}</span>${name}</button>`).join('')}</div>`, 'commands-sheet');
+  if (action === 'commands') return showSheet(`${pickerSheetHeader('自定义命令', fromAdd)}<div class="simple-list">${['总结这段内容','润色这段文字','翻译成英文'].map(name=>`<button class="action-row" data-command="${name}"><span class="row-icon">${icon('terminal')}</span>${name}</button>`).join('')}</div>`, 'commands-sheet');
   if (button.dataset.expert) {currentExpert=button.dataset.expert;updateInput();closeSheet();$('#message').focus({preventScroll:true});return;}
   if (button.dataset.command) {closeSheet();fillPrompt(`${button.dataset.command}：`);return;}
   if (button.dataset.model) {model=button.dataset.model;$('#model-button').textContent=model;closeSheet();return;}

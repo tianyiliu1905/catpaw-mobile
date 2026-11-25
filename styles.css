@@ -373,10 +373,10 @@ svg {
   align-items:center;
   flex-direction:column;
   gap:var(--space-1);
-  height:76px;
-  padding:14px 0;
+  height:72px;
+  padding:14px 0 10px;
   color:var(--ds-text-4);
-  font-size:var(--type-body)
+  font-size:var(--type-label)
 }
 .attachment-tile svg {
   width:24px;
@@ -1105,7 +1105,7 @@ button {
 button:active {
   opacity:1;
 }
-.icon-button:active,.side-links>button:active,.action-row:active,.skill-row:active,.side-history-item:active {
+.icon-button:active,.side-links>button:active,.sheet:not(.add-sheet) .action-row:active,.skill-row:active,.side-history-item:active {
   background:var(--ds-fill-4);
 }
 .icon-button,.side-links>button,.skill-row,.action-row {

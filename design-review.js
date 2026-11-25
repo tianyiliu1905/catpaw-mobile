@@ -29,18 +29,24 @@
     ['展开输入','点击输入框，文字区展开为两行并唤起键盘。'],
     ['打开添加面板','点击加号，选择列表中的“知识库”。'],
     ['选择知识库',iconMode?'企业知识默认关闭，下方列表隐藏。':independent?'可勾选“全选”，也可直接勾选下方任意知识库。':'企业知识默认关闭，列表不可选择。'],
-    iconMode?['开启并多选全部','开启开关后展示列表，默认选中全部知识库；面板保持打开。']:independent?['单独添加','直接勾选“产品文档与使用指南”，立即添加，不影响其他选项。']:['开启企业知识','开启开关，默认选中全部三个知识库。'],
-    iconMode?['单项添加后返回首页','首次点击单项右侧的指定图标进入逐项添加，回到首页显示所选知识文档的名称；再次打开列表仍显示相同图标。']:independent?['一键全选','勾选“全选”可选中全部三个知识库；取消勾选可清空，取消任一单项后，“全选”恢复空心描边状态。']:['按需调整','取消“团队流程与协作规范”，保留两个知识库；关闭开关暂停使用但保留勾选，再开启恢复。'],
-    ['已添加知识库',iconMode?'再次打开并添加另一篇，输入框上方分别展示两篇知识的名称标签；重复添加不产生重复标签。':`选择即时生效，关闭面板后输入正文上方显示绿色“知识 ${independent?3:2}”。`],
+    iconMode?['开启并多选全部','开启开关后展示列表并使用全部，面板保持打开；未逐项指定时，输入框显示“企业知识”标签，不带数量。']:independent?['单独添加','直接勾选“产品指南”，立即添加，不影响其他选项。']:['开启企业知识','开启开关，默认选中全部三个知识库。'],
+    iconMode?['单项添加后返回首页','首次点击单项右侧的指定图标进入逐项添加，回到首页显示所选知识文档的名称；再次打开列表仍显示相同图标。']:independent?['一键全选','勾选“全选”可选中全部三个知识库；取消勾选可清空，取消任一单项后，“全选”恢复空心描边状态。']:['按需调整','取消“团队协作规范”，保留两个知识库；关闭开关暂停使用但保留勾选，再开启恢复。'],
+    ['已添加知识库',iconMode?'再次打开并添加另一篇，输入框上方分别展示两篇知识的名称标签；重复添加不产生重复标签；可点击各标签叉号独立移除；删完最后一篇时，开关仍开启则恢复“企业知识”标签。':`选择即时生效，关闭面板后输入正文上方显示“知识 ${independent?3:2}”。`],
     ['收起输入','空内容点击外部后恢复单行，已选知识库标签仍显示在输入区上方。'],
     ['专家与知识库并排','专家和知识库标签并排位于输入正文上方；点击知识库标签重新选择，专家可通过叉号移除。'],
   ];
   const frames=steps.map(([title,description],index)=>{
     const figure=document.createElement('figure');figure.className='review-step';
     figure.innerHTML=`<button type="button" class="review-step-image" aria-label="查看步骤 ${index+1}：${title}" disabled></button><figcaption><div class="review-step-label"><span>${String(index+1).padStart(2,'0')} · ${title}</span></div><p>${description}</p></figcaption>`;
+    if(index===3){
+      const note=document.createElement('p');
+      note.className='review-height-note';
+      note.textContent='标注：高度和上一级面板一致。';
+      figure.querySelector('figcaption').append(note);
+    }
     if(index===6){
       const note=document.createElement('p');
-      note.textContent='交互说明：点击输入正文上方的绿色知识库标签，可再次打开“选择知识库”弹窗，调整已选知识库；修改立即生效。';
+      note.textContent='交互说明：点击输入正文上方的知识标签，可再次打开“选择知识库”弹窗，调整已选知识库；修改立即生效。';
       figure.querySelector('figcaption').append(note);
     }
     gallery.querySelector('.review-steps').append(figure);
@@ -49,7 +55,7 @@
   });
   function loadSavedSnapshots() {
     for (let index=0;index<steps.length;index++) {
-      const src=new URL(`assets/${iconMode?'design-review-icons':independent?'design-review-independent':'design-review'}/step-${index+1}.png?v=20261125-focus-icon20`,location.href).href;
+      const src=new URL(`assets/${iconMode?'design-review-icons':independent?'design-review-independent':'design-review'}/step-${index+1}.png?v=20261125-attachment72`,location.href).href;
       snapshots[index]=src;
       const button=frames[index].querySelector('button');
       const image=document.createElement('img');image.src=src;image.alt=`${steps[index][0]}：${steps[index][1]}`;
@@ -121,7 +127,7 @@
         if(index===3)win.document.querySelector('[data-action="knowledge"]').click();
         if(index===4)click(independent?'[data-knowledge-id="product"]':'#knowledge-enterprise-toggle');
         if(index===5){click(iconMode?'[data-knowledge-add="product"]':independent?'#knowledge-enterprise-toggle':'[data-knowledge-id="team"]');if(iconMode)await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);}
-        if(index===6){if(iconMode){win.CatpawKnowledge.open();click('[data-knowledge-add="team"]');}else click('#knowledge-cancel');await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);win.CatpawDemoKeyboard.setOpen(true,true);}
+        if(index===6){if(iconMode){win.CatpawKnowledge.open();click('[data-knowledge-add="team"]');}else win.closeSheet();await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);win.CatpawDemoKeyboard.setOpen(true,true);}
         if(index===7)win.CatpawDemoKeyboard.dismiss(true);
         if(index===8){win.CatpawDemoKeyboard.setOpen(true,true);win.openExperts();click('[data-expert="数据分析师"]');await waitFor(win,()=>doc.querySelector('#modal-layer').hidden);win.CatpawDemoKeyboard.setOpen(true,true);}
         await settle(win);
